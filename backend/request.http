@@ -1,0 +1,25 @@
+### Criar usuário
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+    "nome": "Gabriel",
+    "email": "gabriel@teste.com",
+    "senha": "123456"
+}
+
+### Fazer login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "gabriel@teste.com",
+    "senha": "123456"
+}
+
+### Testar rota protegida sem token
+GET http://localhost:3000/auth/me
+
+### Testar rota protegida com token
+GET http://localhost:3000/auth/me
+Authorization: Bearer COLE_SEU_TOKEN_AQUI
