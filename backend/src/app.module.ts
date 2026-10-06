@@ -1,6 +1,10 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
+import { AuthModule } from './modules/auth/auth.module.js';
+import { ClientsModule } from './modules/clients/clients.module.js';
+import { SystemsModule } from './modules/systems/systems.module.js';
+import { ContractsModule } from './modules/contracts/contracts.module.js';
 
 @Module({
   imports: [
@@ -15,6 +19,14 @@ import { MongooseModule } from '@nestjs/mongoose'
         uri: configService.get<string>('MONGODB_URI'),
       }),
     }),
+
+    AuthModule,
+
+    ClientsModule,
+
+    SystemsModule,
+
+    ContractsModule,
   ],
 })
 export class AppModule {}
