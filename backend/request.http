@@ -61,3 +61,39 @@ Authorization: Bearer SEU_TOKEN_AQUI
 ### Desativar cliente
 PATCH http://localhost:3000/clients/ID_DO_CLIENTE/deactivate
 Authorization: Bearer SEU_TOKEN_AQUI
+
+### Criar sistema
+POST http://localhost:3000/systems
+Authorization: Bearer SEU_TOKEN_AQUI
+Content-Type: application/json
+
+{
+    "nome": "ContractFlow",
+    "descricao": "Sistema para gerenciamento de contratos e licenças de software",
+    "versao": "1.0.0"
+}
+
+### Listar sistemas
+GET http://localhost:3000/systems
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### Buscar sistema
+GET http://localhost:3000/systems/ID_DO_SISTEMA
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### Sistemas sem autenticação
+GET http://localhost:3000/systems
+
+### Atualizar sistema
+PATCH http://localhost:3000/systems/ID_DO_SISTEMA
+Authorization: Bearer SEU_TOKEN_AQUI
+Content-Type: application/json
+
+{
+    "descricao": "Sistema completo para gerenciamento de contratos e licenças",
+    "versao": "1.1.0"
+}
+
+### Desativar sistema
+PATCH http://localhost:3000/systems/ID_DO_SISTEMA/deactivate
+Authorization: Bearer SEU_TOKEN_AQUI
