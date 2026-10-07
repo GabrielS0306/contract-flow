@@ -23,3 +23,41 @@ GET http://localhost:3000/auth/me
 ### Testar rota protegida com token
 GET http://localhost:3000/auth/me
 Authorization: Bearer COLE_SEU_TOKEN_AQUI
+
+### Criar cliente
+POST http://localhost:3000/clients
+Authorization: Bearer SEU_TOKEN_AQUI
+Content-Type: application/json
+
+{
+    "nome": "Empresa Exemplo LTDA",
+    "documento": "12.345.678/0001-90",
+    "endereco": "João Pessoa - PB",
+    "representante": "João da Silva",
+    "email": "contato@empresa.com",
+    "telefone": "(83) 99999-9999",
+    "observacoes": "Cliente de teste"
+}
+
+### Listar clientes
+GET http://localhost:3000/clients
+Authorization: Bearer SEU_TOKEN_AQUI
+### Buscar cliente
+GET http://localhost:3000/clients/ID_DO_CLIENTE
+Authorization: Bearer SEU_TOKEN_AQUI
+
+### Clientes sem autenticação
+GET http://localhost:3000/clients
+
+### Editar cliente
+PATCH http://localhost:3000/clients/ID_DO_CLIENTE
+Authorization: Bearer SEU_TOKEN_AQUI
+
+{
+    "nome": "Empresa Exemplo Atualizada",
+    "telefone": "(83) 98888-8888"
+}
+
+### Desativar cliente
+PATCH http://localhost:3000/clients/ID_DO_CLIENTE/deactivate
+Authorization: Bearer SEU_TOKEN_AQUI
