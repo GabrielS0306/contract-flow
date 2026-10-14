@@ -84,6 +84,26 @@ export class Contract {
         default: ContractStatus.ATIVO,
     })
     status: ContractStatus
+
+    @Prop({
+        trim: true,
+    })
+    arquivoNome?: string
+
+    @Prop({
+        trim: true,
+    })
+    arquivoCaminho?: string
+
+    @Prop({
+        trim: true,
+    })
+    arquivoMimeType?: string
+
+    @Prop({
+        min: 0,
+    })
+    arquivoTamanho?: number
 }
 
 export const ContractSchema = SchemaFactory.createForClass(Contract)

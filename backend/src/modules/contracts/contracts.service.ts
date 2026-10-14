@@ -5,6 +5,13 @@ import {
 } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model, Types } from 'mongoose'
+import { unlink } from 'node:fs/promises'
+import { resolve, basename } from 'node:path'
+
+import {
+    createReadStream,
+    existsSync,
+} from 'node:fs'
 
 import {
     Contract,
@@ -199,5 +206,106 @@ export class ContractsService {
         }
 
         return contract
+    }
+
+    async uploadArquivo(
+        id: string,
+        arquivo: {
+            arquivoNome: string
+            arquivoCaminho: string
+            arquivoMimeType: string
+            arquivoTamanho: number
+        },
+    ) {
+        if (!Types.ObjectId.isValid(id)) {
+            await unlink(
+                resolve('uploads/contracts', arquivo.arquivoCaminho),
+            ).catch(() => undefined)
+
+            throw new BadRequestException(
+                'ID do contrato inválido',
+            )
+        }
+
+        const contrato = await this.contractModel.findById(id)
+
+        if (!contrato) {
+            await unlink(
+                resolve('uploads/contracts', arquivo.arquivoCaminho),
+            ).catch(() => undefined)
+
+            throw new NotFoundException(
+                'Contrato não encontrado',
+            )
+        }
+
+        const arquivoAnterior = contrato.arquivoCaminho
+
+        try {
+            contrato.set({
+                arquivoNome: arquivo.arquivoNome,
+                arquivoCaminho: arquivo.arquivoCaminho,
+                arquivoMimeType: arquivo.arquivoMimeType,
+                arquivoTamanho: arquivo.arquivoTamanho,
+            })
+
+            await contrato.save()
+        } catch (erro) {
+            await unlink(
+                resolve('uploads/contracts', arquivo.arquivoCaminho),
+            ).catch(() => undefined)
+
+            throw erro
+        }
+
+        if (
+            arquivoAnterior &&
+            arquivoAnterior !== arquivo.arquivoCaminho
+        ) {
+            await unlink(
+                resolve('uploads/contracts', arquivoAnterior),
+            ).catch(() => undefined)
+        }
+
+        return this.findOne(id)
+    }
+
+        async obterCaminhoArquivo(id: string) {
+        if (!Types.ObjectId.isValid(id)) {
+            throw new BadRequestException(
+                'ID do contrato inválido',
+            )
+        }
+
+        const contrato = await this.contractModel.findById(id)
+
+        if (!contrato) {
+            throw new NotFoundException(
+                'Contrato não encontrado',
+            )
+        }
+
+        if (!contrato.arquivoCaminho) {
+            throw new NotFoundException(
+                'Este contrato não possui um PDF associado',
+            )
+        }
+
+        const nomeArquivo = basename(contrato.arquivoCaminho)
+        const caminhoArquivo = resolve(
+            'uploads/contracts',
+            nomeArquivo,
+        )
+
+        if (!existsSync(caminhoArquivo)) {
+            throw new NotFoundException(
+                'O arquivo PDF não foi encontrado no armazenamento',
+            )
+        }
+
+        return {
+            caminhoArquivo,
+            nomeOriginal: contrato.arquivoNome ?? 'contrato.pdf',
+        }
     }
 }

@@ -1,10 +1,9 @@
 @baseUrl = http://localhost:3000
 
-# Substitua pelos IDs reais de registros ativos
+# IDs de registros existentes
 @clienteId = 6ace7f8183c4e2401f0caeb9
 @sistemaId = 6ac684872adaa4e103234a0e
 @contratoId = 6acfbb133ce6ef85696c4956
-
 
 ### ==========================================
 ### 1. AUTENTICAÇÃO
@@ -21,7 +20,6 @@ Content-Type: application/json
     "senha": "123456"
 }
 
-
 ### Fazer login
 # @name login
 POST {{baseUrl}}/auth/login
@@ -32,15 +30,12 @@ Content-Type: application/json
     "senha": "123456"
 }
 
-
 ### Testar rota protegida sem token - esperado: 401
 GET {{baseUrl}}/auth/me
-
 
 ### Testar rota protegida com token
 GET {{baseUrl}}/auth/me
 Authorization: Bearer {{login.response.body.$.access_token}}
-
 
 ### ==========================================
 ### 2. CLIENTES
@@ -60,20 +55,16 @@ Content-Type: application/json
     "observacoes": "Cliente ativo para testes de contratos"
 }
 
-
 ### Listar clientes
 GET {{baseUrl}}/clients
 Authorization: Bearer {{login.response.body.$.access_token}}
-
 
 ### Buscar cliente
 GET {{baseUrl}}/clients/{{clienteId}}
 Authorization: Bearer {{login.response.body.$.access_token}}
 
-
 ### Clientes sem autenticação - esperado: 401
 GET {{baseUrl}}/clients
-
 
 ### Editar cliente
 PATCH {{baseUrl}}/clients/{{clienteId}}
@@ -85,11 +76,9 @@ Content-Type: application/json
     "telefone": "(83) 98888-8888"
 }
 
-
 ### Desativar cliente - execute somente quando desejado
 PATCH {{baseUrl}}/clients/{{clienteId}}/deactivate
 Authorization: Bearer {{login.response.body.$.access_token}}
-
 
 ### ==========================================
 ### 3. SISTEMAS
@@ -107,20 +96,16 @@ Content-Type: application/json
     "versao": "1.0.0"
 }
 
-
 ### Listar sistemas
 GET {{baseUrl}}/systems
 Authorization: Bearer {{login.response.body.$.access_token}}
-
 
 ### Buscar sistema
 GET {{baseUrl}}/systems/{{sistemaId}}
 Authorization: Bearer {{login.response.body.$.access_token}}
 
-
 ### Sistemas sem autenticação - esperado: 401
 GET {{baseUrl}}/systems
-
 
 ### Atualizar sistema
 PATCH {{baseUrl}}/systems/{{sistemaId}}
@@ -132,11 +117,9 @@ Content-Type: application/json
     "versao": "1.1.0"
 }
 
-
 ### Desativar sistema - execute somente quando desejado
 PATCH {{baseUrl}}/systems/{{sistemaId}}/deactivate
 Authorization: Bearer {{login.response.body.$.access_token}}
-
 
 ### ==========================================
 ### 4. CONTRATOS
@@ -149,7 +132,7 @@ Authorization: Bearer {{login.response.body.$.access_token}}
 Content-Type: application/json
 
 {
-    "numero": "CONT-2026-001",
+    "numero": "CONT-2026-002",
     "clienteId": "{{clienteId}}",
     "sistemaId": "{{sistemaId}}",
     "periodicidade": "MENSAL",
@@ -179,12 +162,31 @@ Content-Type: application/json
     "observacoes": "Valor atualizado para teste"
 }
 
-
 ### Reativar contrato
 PATCH {{baseUrl}}/contracts/{{contratoId}}/activate
 Authorization: Bearer {{login.response.body.$.access_token}}
 
-
 ### Encerrar contrato - execute somente quando desejado
 PATCH {{baseUrl}}/contracts/{{contratoId}}/deactivate
+Authorization: Bearer {{login.response.body.$.access_token}}
+
+### ==========================================
+### 5. ARQUIVOS PDF
+### ==========================================
+
+### Enviar PDF para um contrato existente
+# O arquivo deve estar na mesma pasta deste request.http
+POST {{baseUrl}}/contracts/{{contratoId}}/upload
+Authorization: Bearer {{login.response.body.$.access_token}}
+Content-Type: multipart/form-data; boundary=ContractBoundary
+
+--ContractBoundary
+Content-Disposition: form-data; name="arquivo"; filename="contrato_teste_contractflow.pdf"
+Content-Type: application/pdf
+
+< ./contrato_teste_contractflow.pdf
+--ContractBoundary--
+
+### Baixar PDF do contrato
+GET {{baseUrl}}/contracts/{{contratoId}}/download
 Authorization: Bearer {{login.response.body.$.access_token}}
