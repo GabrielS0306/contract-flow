@@ -58,4 +58,10 @@ export class SystemsController {
     ) {
         return this.systemsService.deactivate(id)
     }
+
+    
+    @Patch(':id/activate')
+    activate(@Param('id') id: string) {
+        return this.systemsService.activate(id)
+    }
 }

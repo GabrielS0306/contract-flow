@@ -1,3 +1,4 @@
+
 import {
     Injectable,
     NotFoundException,
@@ -49,7 +50,7 @@ export class SystemsService {
             id,
             updateSystemDto,
             {
-                new: true,
+                returnDocument: 'after',
                 runValidators: true,
             },
         )
@@ -68,7 +69,27 @@ export class SystemsService {
                 ativo: false,
             },
             {
-                new: true,
+                returnDocument: 'after',
+                runValidators: true,
+            },
+        )
+
+        if (!system) {
+            throw new NotFoundException('Sistema não encontrado')
+        }
+
+        return system
+    }
+
+    async activate(id: string) {
+        const system = await this.systemModel.findByIdAndUpdate(
+            id,
+            {
+                ativo: true,
+            },
+            {
+                returnDocument: 'after',
+                runValidators: true,
             },
         )
 

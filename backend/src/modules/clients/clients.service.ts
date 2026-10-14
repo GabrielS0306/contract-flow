@@ -46,7 +46,7 @@ export class ClientsService {
             id,
             updateClientDto,
             {
-                new: true,
+                returnDocument: 'after',
                 runValidators: true,
             },
         )
@@ -65,7 +65,7 @@ export class ClientsService {
                 ativo: false,
             },
             {
-                new: true,
+                returnDocument: 'after',
             },
         )
 

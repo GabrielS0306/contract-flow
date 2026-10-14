@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import {
+    ConflictException,
+    Injectable,
+    UnauthorizedException,
+} from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { JwtService } from '@nestjs/jwt'
 import { Model } from 'mongoose'
@@ -18,6 +22,16 @@ export class AuthService {
 
     async createUser(createUserDto: CreateUserDto) {
         const { nome, email, senha } = createUserDto
+
+        const usuarioExistente = await this.userModel.findOne({
+            email: email.toLowerCase(),
+        })
+
+        if (usuarioExistente) {
+            throw new ConflictException(
+                'Este e-mail já está cadastrado',
+            )
+        }
 
         const senhaHash = await bcrypt.hash(senha, 10)
 

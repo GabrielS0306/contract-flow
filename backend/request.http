@@ -1,5 +1,18 @@
-### Criar usuário
-POST http://localhost:3000/auth/register
+@baseUrl = http://localhost:3000
+
+# Substitua pelos IDs reais de registros ativos
+@clienteId = 6ace7f8183c4e2401f0caeb9
+@sistemaId = 6ac684872adaa4e103234a0e
+@contratoId = 6acfbb133ce6ef85696c4956
+
+
+### ==========================================
+### 1. AUTENTICAÇÃO
+### ==========================================
+
+### Criar usuário - execute somente se ainda não existir
+# @name register
+POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
@@ -8,8 +21,10 @@ Content-Type: application/json
     "senha": "123456"
 }
 
+
 ### Fazer login
-POST http://localhost:3000/auth/login
+# @name login
+POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
@@ -17,54 +32,73 @@ Content-Type: application/json
     "senha": "123456"
 }
 
-### Testar rota protegida sem token
-GET http://localhost:3000/auth/me
+
+### Testar rota protegida sem token - esperado: 401
+GET {{baseUrl}}/auth/me
+
 
 ### Testar rota protegida com token
-GET http://localhost:3000/auth/me
-Authorization: Bearer COLE_SEU_TOKEN_AQUI
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{login.response.body.$.access_token}}
 
-### Criar cliente
-POST http://localhost:3000/clients
-Authorization: Bearer SEU_TOKEN_AQUI
+
+### ==========================================
+### 2. CLIENTES
+### ==========================================
+
+### Criar cliente de teste - use documento ainda não cadastrado
+# @name criarCliente
+POST {{baseUrl}}/clients
+Authorization: Bearer {{login.response.body.$.access_token}}
 Content-Type: application/json
 
 {
-    "nome": "Empresa Exemplo LTDA",
-    "documento": "12.345.678/0001-90",
-    "endereco": "João Pessoa - PB",
-    "representante": "João da Silva",
-    "email": "contato@empresa.com",
-    "telefone": "(83) 99999-9999",
-    "observacoes": "Cliente de teste"
+    "nome": "Cliente Teste ContractFlow",
+    "documento": "SUBSTITUA_POR_DOCUMENTO_UNICO",
+    "email": "teste2@contractflow.com",
+    "telefone": "(83) 98888-7777",
+    "observacoes": "Cliente ativo para testes de contratos"
 }
 
-### Listar clientes
-GET http://localhost:3000/clients
-Authorization: Bearer SEU_TOKEN_AQUI
-### Buscar cliente
-GET http://localhost:3000/clients/ID_DO_CLIENTE
-Authorization: Bearer SEU_TOKEN_AQUI
 
-### Clientes sem autenticação
-GET http://localhost:3000/clients
+### Listar clientes
+GET {{baseUrl}}/clients
+Authorization: Bearer {{login.response.body.$.access_token}}
+
+
+### Buscar cliente
+GET {{baseUrl}}/clients/{{clienteId}}
+Authorization: Bearer {{login.response.body.$.access_token}}
+
+
+### Clientes sem autenticação - esperado: 401
+GET {{baseUrl}}/clients
+
 
 ### Editar cliente
-PATCH http://localhost:3000/clients/ID_DO_CLIENTE
-Authorization: Bearer SEU_TOKEN_AQUI
+PATCH {{baseUrl}}/clients/{{clienteId}}
+Authorization: Bearer {{login.response.body.$.access_token}}
+Content-Type: application/json
 
 {
     "nome": "Empresa Exemplo Atualizada",
     "telefone": "(83) 98888-8888"
 }
 
-### Desativar cliente
-PATCH http://localhost:3000/clients/ID_DO_CLIENTE/deactivate
-Authorization: Bearer SEU_TOKEN_AQUI
 
-### Criar sistema
-POST http://localhost:3000/systems
-Authorization: Bearer SEU_TOKEN_AQUI
+### Desativar cliente - execute somente quando desejado
+PATCH {{baseUrl}}/clients/{{clienteId}}/deactivate
+Authorization: Bearer {{login.response.body.$.access_token}}
+
+
+### ==========================================
+### 3. SISTEMAS
+### ==========================================
+
+### Criar sistema - execute somente se ainda não existir
+# @name criarSistema
+POST {{baseUrl}}/systems
+Authorization: Bearer {{login.response.body.$.access_token}}
 Content-Type: application/json
 
 {
@@ -73,20 +107,24 @@ Content-Type: application/json
     "versao": "1.0.0"
 }
 
+
 ### Listar sistemas
-GET http://localhost:3000/systems
-Authorization: Bearer SEU_TOKEN_AQUI
+GET {{baseUrl}}/systems
+Authorization: Bearer {{login.response.body.$.access_token}}
+
 
 ### Buscar sistema
-GET http://localhost:3000/systems/ID_DO_SISTEMA
-Authorization: Bearer SEU_TOKEN_AQUI
+GET {{baseUrl}}/systems/{{sistemaId}}
+Authorization: Bearer {{login.response.body.$.access_token}}
 
-### Sistemas sem autenticação
-GET http://localhost:3000/systems
+
+### Sistemas sem autenticação - esperado: 401
+GET {{baseUrl}}/systems
+
 
 ### Atualizar sistema
-PATCH http://localhost:3000/systems/ID_DO_SISTEMA
-Authorization: Bearer SEU_TOKEN_AQUI
+PATCH {{baseUrl}}/systems/{{sistemaId}}
+Authorization: Bearer {{login.response.body.$.access_token}}
 Content-Type: application/json
 
 {
@@ -94,6 +132,59 @@ Content-Type: application/json
     "versao": "1.1.0"
 }
 
-### Desativar sistema
-PATCH http://localhost:3000/systems/ID_DO_SISTEMA/deactivate
-Authorization: Bearer SEU_TOKEN_AQUI
+
+### Desativar sistema - execute somente quando desejado
+PATCH {{baseUrl}}/systems/{{sistemaId}}/deactivate
+Authorization: Bearer {{login.response.body.$.access_token}}
+
+
+### ==========================================
+### 4. CONTRATOS
+### ==========================================
+
+### Criar contrato
+# @name criarContrato
+POST {{baseUrl}}/contracts
+Authorization: Bearer {{login.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+    "numero": "CONT-2026-001",
+    "clienteId": "{{clienteId}}",
+    "sistemaId": "{{sistemaId}}",
+    "periodicidade": "MENSAL",
+    "valor": 199.90,
+    "valorImplantacao": 500,
+    "dataInicio": "2026-10-13T00:00:00.000Z",
+    "dataFim": "2027-10-13T00:00:00.000Z",
+    "diaVencimento": 10,
+    "observacoes": "Contrato de teste do ContractFlow"
+}
+
+### Listar contratos
+GET {{baseUrl}}/contracts
+Authorization: Bearer {{login.response.body.$.access_token}}
+
+### Buscar contrato
+GET {{baseUrl}}/contracts/{{contratoId}}
+Authorization: Bearer {{login.response.body.$.access_token}}
+
+### Atualizar contrato
+PATCH {{baseUrl}}/contracts/{{contratoId}}
+Authorization: Bearer {{login.response.body.$.access_token}}
+Content-Type: application/json
+
+{
+    "valor": 249.90,
+    "observacoes": "Valor atualizado para teste"
+}
+
+
+### Reativar contrato
+PATCH {{baseUrl}}/contracts/{{contratoId}}/activate
+Authorization: Bearer {{login.response.body.$.access_token}}
+
+
+### Encerrar contrato - execute somente quando desejado
+PATCH {{baseUrl}}/contracts/{{contratoId}}/deactivate
+Authorization: Bearer {{login.response.body.$.access_token}}
